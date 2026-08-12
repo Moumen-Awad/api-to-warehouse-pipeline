@@ -1,0 +1,13 @@
+version: 2
+
+models:
+  - name: stg_coins_markets
+    description: "Staging model for market coins data"
+    columns:
+    - name: coin_id
+      tests:
+      - not_null
+      - unique
+    - name: current_price_usd
+      tests:
+      - not_null
