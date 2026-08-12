@@ -1,0 +1,8 @@
+version: 2
+
+sources:
+  - name: staging
+    database: moumen_warehouse  # اسم قاعدة البيانات الخاصة بك
+    schema: staging             # الـ Schema الحالية الموجود فيها الجدول الخام
+    tables:
+      - name: coins_markets_raw # اسم الجدول الخام
