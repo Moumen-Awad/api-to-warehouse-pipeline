@@ -1,0 +1,14 @@
+version: 2
+
+sources:
+  - name: staging
+    database: moumen_warehouse
+    schema: staging
+    tables:
+      - name: coins_markets_raw
+        description: "Raw cryptocurrency market data ingested from source"
+        columns:
+          - name: id
+            tests:
+              - not_null
+              - unique
