@@ -1,10 +1,14 @@
 import requests
 import json
 import os
-import time
 from datetime import datetime, timezone
 
+from utils import get_logger, fetch_with_retry
+
+logger = get_logger(__name__)
+
 RAW_DIRECTORY = os.path.join(os.environ.get("AIRFLOW_HOME", "."), "include", "raw")
+
 os.makedirs(RAW_DIRECTORY, exist_ok=True)
 
 def fetch_market_data(vs_currency="usd", per_page=100, page=1):
@@ -19,9 +23,12 @@ def fetch_market_data(vs_currency="usd", per_page=100, page=1):
         "page": page
     }
 
-    response = requests.get(url, params=params, timeout=30)
-    response.raise_for_status()
-    return response.json()
+    def _request():
+        response = requests.get(url, params=params, timeout=30)
+        response.raise_for_status()
+        return response.json()
+
+    return fetch_with_retry(_request, logger=logger)
 
 def save_raw(data, filename_prefix="coin_markets"):
     """
@@ -31,26 +38,33 @@ def save_raw(data, filename_prefix="coin_markets"):
     filepath = os.path.join(RAW_DIRECTORY, f"{filename_prefix}_{timestamp}.json")
     with open(filepath, "w") as f:
         json.dump(data, f, indent=2)
-    print(f"Saved{len(data)} records to {filepath}")
+    logger.info(f"Saved {len(data)} records to {filepath}")
 
 if __name__ == "__main__":
     all_data = []
     current_page = 1
     max_pages = 5 # Free API Limit
 
-    print("Starting ingestion process ...")
+    logger.info("Starting ingestion process ...")
 
     while current_page <= max_pages:
-        print(f"Fetnching page {current_page} ...")
+        logger.info(f"Fetching page {current_page} ...")
 
-        page_data = fetch_market_data(page=current_page)
+        try:
+            page_data = fetch_market_data(page=current_page)
+        except Exception as e:
+            logger.error(f"Stopping execution due to unhandled error on page {current_page}: {e}")
+            break
 
         if not page_data:
-            print(f"No more data to be fetched, Stopping at page {current_page}")
+            logger.info(f"No more data to be fetched, Stopping at page {current_page}")
             break
-        all_data.extend(page_data)
 
+        all_data.extend(page_data)
         current_page += 1
 
     if all_data:
         save_raw(all_data)
+        logger.info("Ingestion completed successfully.")
+    else:
+        logger.warning("No data was fetched during this run.")

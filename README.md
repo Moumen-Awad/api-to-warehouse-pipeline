@@ -5,3 +5,7 @@ An end-to-end data engineering pipeline built to practice real-world ELT design.
 ## Simple Architecture
 
 ![Architecture Diagram](docs/architecture.png)
+
+## Data Dictionary
+
+The data exists after the transformation in the mart table: [Data Dictionary](docs/data_dictionary.md).
