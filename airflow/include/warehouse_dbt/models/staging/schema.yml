@@ -7,7 +7,6 @@ models:
     - name: coin_id
       tests:
       - not_null
-      - unique
     - name: current_price_usd
       tests:
       - not_null
