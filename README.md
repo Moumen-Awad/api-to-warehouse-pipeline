@@ -4,11 +4,11 @@ An end-to-end data engineering pipeline built to practice real-world ELT design.
 
 ## Demo
 
-![Pipeline running successfully](docs/demo.gif)
+![Pipeline running successfully](docs/assets/demo.gif)
 
 ## Simple Architecture
 
-![Architecture Diagram](docs/architecture.png)
+![Architecture Diagram](docs/assets/architecture.png)
 
 ## Data Dictionary
 
