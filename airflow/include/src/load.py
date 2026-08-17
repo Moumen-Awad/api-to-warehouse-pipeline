@@ -18,6 +18,11 @@ DB_NAME = os.getenv("POSTGRES_DB", "moumen_warehouse")
 
 DB_URL = f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
 
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+DEFAULT_RAW_DIRECTORY = os.path.abspath(os.path.join(SCRIPT_DIR, "..", "raw"))
+ 
+RAW_DIRECTORY = os.environ.get("RAW_DATA_DIR", DEFAULT_RAW_DIRECTORY)
+
 def get_engine():
     return create_engine(DB_URL)
 
@@ -60,11 +65,10 @@ if __name__ == "__main__":
     engine = get_engine()
     create_staging_table(engine)
 
-    raw_dir = os.path.join(os.environ.get("AIRFLOW_HOME", "."), "include", "raw")
-    files = glob.glob(os.path.join(raw_dir, "*.json"))
+    files = glob.glob(os.path.join(RAW_DIRECTORY, "*.json"))
 
     if not files:
-        logger.warning(f"No raw files found in {raw_dir}")
+        logger.warning(f"No raw files found in {RAW_DIRECTORY}")
 
     for filepath in files:
         try:

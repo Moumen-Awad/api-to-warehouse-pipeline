@@ -7,8 +7,10 @@ from utils import get_logger, fetch_with_retry
 
 logger = get_logger(__name__)
 
-RAW_DIRECTORY = os.path.join(os.environ.get("AIRFLOW_HOME", "."), "include", "raw")
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+DEFAULT_RAW_DIRECTORY = os.path.abspath(os.path.join(SCRIPT_DIR, "..", "raw"))
 
+RAW_DIRECTORY = os.environ.get("RAW_DATA_DIR", DEFAULT_RAW_DIRECTORY)
 os.makedirs(RAW_DIRECTORY, exist_ok=True)
 
 def fetch_market_data(vs_currency="usd", per_page=100, page=1):
